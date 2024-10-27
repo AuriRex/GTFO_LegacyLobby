@@ -78,6 +78,10 @@
             <HintPath>$(LatestGeneratedGameAssembliesPath)Modules-ASM.dll</HintPath>
             <Private>False</Private>
         </Reference>
+        <Reference Include="SNet_ASM">
+            <HintPath>$(LatestGeneratedGameAssembliesPath)SNet_ASM.dll</HintPath>
+            <Private>False</Private>
+        </Reference>
         <Reference Include="Addons-ASM">
             <HintPath>$(LatestGeneratedGameAssembliesPath)Addons-ASM.dll</HintPath>
             <Private>False</Private>

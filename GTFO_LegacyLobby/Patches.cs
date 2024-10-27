@@ -1,6 +1,8 @@
 using System;
+using System.Reflection;
 using CellMenu;
 using HarmonyLib;
+using System.IO;
 using LegacyLobby.Extensions;
 using UnityEngine;
 
@@ -24,11 +26,23 @@ public static class CM_PageRundown_New__OnEnable__Patch
         
         if (CM_Camera.Current == null)
             return;
+
+        var dllPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+
+        var overrideNoisePath = Path.Combine(dllPath, "Noise.png");
+
+        var imageBytes = Resources.NoiseTexture;
+        
+        if (File.Exists(overrideNoisePath))
+        {
+            Plugin.L.LogWarning($"Using custom noise texture: {overrideNoisePath}");
+            imageBytes = File.ReadAllBytes(overrideNoisePath);
+        }
         
         /* Pre R6 esque lobby shading (not perfect)*/
         try
         {
-            Plugin.LoadImage(Resources.NoiseTexture, out var texture);
+            Plugin.LoadImage(imageBytes, out var texture);
             
             if (texture == null)
             {
@@ -69,16 +83,16 @@ public static class CM_PlayerLobbyBar__SetupFromPage__Patch
         
         var corners = __instance.m_corners;
         corners.transform.SetParent(playerRoot, true);
+        // Fix sorting layer (For some reason both of those are on the 'MenuPopupSprite' layer)
+        corners.transform.FindExactChild("CornerBL").GetComponent<SpriteRenderer>().sortingLayerName = "Default";
+        corners.transform.FindExactChild("CornerBR").GetComponent<SpriteRenderer>().sortingLayerName = "Default";
         corners.SetActive(false);
 
         FixGUIX(playerRoot);
         
         // Move Ready Status text to the bottom
         __instance.m_statusText.transform.localPosition = new Vector3(-115, -630, 0);
-        
-        // TODO: Move them
-        playerRoot.FindExactChild("BoosterImplantButtons").gameObject.SetActive(false);
-        
+
         // bye bye "Weapons" text :D
         playerRoot.FindExactChild("Inventory_Header").localPosition = new Vector3(-3000, 0, 0);
 
@@ -97,6 +111,10 @@ public static class CM_PlayerLobbyBar__SetupFromPage__Patch
         slotSpecial.localPosition = new Vector3(mainX, BASE_POS - OFFSET * 1, mainZ);
         slotTool.localPosition = new Vector3(mainX, BASE_POS - OFFSET * 2, mainZ);
         slotMelee.localPosition = new Vector3(mainX, BASE_POS - OFFSET * 3, mainZ);
+
+        var permButtonPos = __instance.m_permissionButton.transform.localPosition;
+        
+        __instance.m_permissionButton.transform.localPosition = new Vector3(permButtonPos.x, 470f, permButtonPos.z);
     }
 
     private static void FixGUIX(Transform playerRoot)
@@ -116,6 +134,26 @@ public static class CM_PlayerLobbyBar__SetupFromPage__Patch
         
         var tl = corners3.FindExactChild("CornerTL");
         tl.localPosition = new Vector3(tl.localPosition.x, 132, tl.localPosition.z);
+    }
+}
+
+[HarmonyWrapSafe]
+// /* INLINED */[HarmonyPatch(typeof(CM_BoosterImplantSlotHolder), nameof(CM_BoosterImplantSlotHolder.SetupSlotItems))]
+[HarmonyPatch(typeof(CM_BoosterImplantSlotHolder), nameof(CM_BoosterImplantSlotHolder.UpdateBoosterImplantInventory))]
+public static class CM_BoosterImplantSlotHolder__SetupSlotItems__Patch
+{
+    public static void Postfix(CM_BoosterImplantSlotHolder __instance)
+    {
+        var c = 2;
+        foreach (var kvp in __instance.m_categorySlots)
+        {
+            //var category = kvp.Key;
+            var item = kvp.Value;
+            
+            item.transform.localPosition = new Vector3(400, -10 + 160 * c, 0);
+
+            c--;
+        }
     }
 }
 
