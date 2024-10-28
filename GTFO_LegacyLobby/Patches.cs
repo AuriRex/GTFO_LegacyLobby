@@ -107,8 +107,9 @@ public static class CM_PlayerLobbyBar__SetupFromPage__Patch
         FixGUIX(playerRoot);
         
         // Move Ready Status text to the bottom
-        __instance.m_statusText.transform.localPosition = new Vector3(-115, -630, 0);
-
+        __instance.m_statusText.transform.localPosition = new Vector3(-15, -620, 0);
+        __instance.m_statusText.m_textAlignment = TMPro.TextAlignmentOptions.MidlineLeft;
+        
         // bye bye "Weapons" text :D
         playerRoot.FindExactChild("Inventory_Header").localPosition = new Vector3(-3000, 0, 0);
 
