@@ -111,7 +111,7 @@ public static class CM_PlayerLobbyBar__SetupFromPage__Patch
         __instance.m_statusText.m_textAlignment = TMPro.TextAlignmentOptions.MidlineLeft;
         
         // bye bye "Weapons" text :D
-        playerRoot.FindExactChild("Inventory_Header").localPosition = new Vector3(-3000, 0, 0);
+        playerRoot.FindExactChild("Inventory_Header").localPosition = new Vector3(-5000, -5000, 0);
 
         var clothes = __instance.m_clothesButton.transform;
         clothes.localPosition = new Vector3(clothes.localPosition.x, -700, clothes.localPosition.z);
