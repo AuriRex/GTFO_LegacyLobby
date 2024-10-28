@@ -1,7 +1,7 @@
 {
     "name": "LegacyLobby",
     "author": "AuriRex",
-    "version_number": "1.0.0",
+    "version_number": "1.0.1",
     "website_url": "https://github.com/AuriRex/GTFO_LegacyLobby/",
     "description": "Brings back the lobby screen aestethic of Rundown 1 through 4.",
     "dependencies": [
