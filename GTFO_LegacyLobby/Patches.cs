@@ -9,6 +9,22 @@ using UnityEngine;
 namespace LegacyLobby;
 
 [HarmonyWrapSafe]
+[HarmonyPatch(typeof(CM_PageLoadout), nameof(CM_PageLoadout.Setup))]
+public static class CM_PageLoadout__Setup__Patch
+{
+    public static void Postfix(CM_PageLoadout __instance)
+    {
+        var decorText = __instance.m_readyButtonAlign.FindExactChild("DecorText");
+        decorText.gameObject.SetActive(true);
+
+        var decorTextTwo = UnityEngine.Object.Instantiate(decorText, __instance.m_dropButton.transform);
+        decorTextTwo.localPosition = Vector3.zero;
+        
+        decorText.SetParent(__instance.m_readyButton.transform, true);
+    }
+}
+
+[HarmonyWrapSafe]
 [HarmonyPatch(typeof(CM_PageRundown_New), nameof(CM_PageRundown_New.OnEnable))]
 public static class CM_PageRundown_New__OnEnable__Patch
 {
