@@ -22,7 +22,7 @@ public class Plugin : BasePlugin
 {
     public const string GUID = "dev.aurirex.gtfo.legacylobby";
     public const string NAME = "LegacyLobby";
-    public const string VERSION = "1.0.2";
+    public const string VERSION = "1.1.0";
 
     public const string FORCE_DEFAULT_VANITY_GUID = "JarheadHME.ForceDefaultVanity";
     
