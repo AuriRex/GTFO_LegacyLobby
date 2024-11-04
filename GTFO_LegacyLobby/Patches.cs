@@ -3,6 +3,7 @@ using System.Reflection;
 using CellMenu;
 using HarmonyLib;
 using System.IO;
+using LegacyLobby.Components;
 using LegacyLobby.Extensions;
 using UnityEngine;
 
@@ -114,7 +115,7 @@ public static class CM_PlayerLobbyBar__SetupFromPage__Patch
         playerRoot.FindExactChild("Inventory_Header").localPosition = new Vector3(-5000, -5000, 0);
 
         var clothes = __instance.m_clothesButton.transform;
-        clothes.localPosition = new Vector3(clothes.localPosition.x, -700, clothes.localPosition.z);
+        clothes.localPosition = new Vector3(clothes.localPosition.x, -700 * 100, clothes.localPosition.z);
 
         var slotMain = __instance.m_slotStandardAlign;
         var slotSpecial = __instance.m_slotSpecialAlign;
@@ -159,18 +160,37 @@ public static class CM_PlayerLobbyBar__SetupFromPage__Patch
 [HarmonyPatch(typeof(CM_BoosterImplantSlotHolder), nameof(CM_BoosterImplantSlotHolder.UpdateBoosterImplantInventory))]
 public static class CM_BoosterImplantSlotHolder__SetupSlotItems__Patch
 {
+    public const string CLOTHES_BUTTON_NAME = "Custom_Clothes_Button_Booster_Style";
     public static void Postfix(CM_BoosterImplantSlotHolder __instance)
     {
-        var c = 2;
+        var forceDefaultVanity = Plugin.IsForceDefaultVanityInstalled;
+        
+        var c = forceDefaultVanity ? 2 : 3;
         foreach (var kvp in __instance.m_categorySlots)
         {
-            //var category = kvp.Key;
-            var item = kvp.Value;
+            var implantItem = kvp.Value;
             
-            item.transform.localPosition = new Vector3(400, -10 + 160 * c, 0);
+            implantItem.transform.localPosition = new Vector3(400, -10 + 160 * c, 0);
 
             c--;
         }
+
+        if (forceDefaultVanity)
+            return;
+        
+        var clothesButton = ClothesButton.GetOrSetupFromLobbyBar(__instance.GetComponentInParent<CM_PlayerLobbyBar>());
+        
+        clothesButton?.CheckUpdateAndToggleState();
+    }
+}
+
+[HarmonyWrapSafe]
+[HarmonyPatch(typeof(CM_ExtraCamera), nameof(CM_ExtraCamera.CheckInitialized))]
+public static class CM_ExtraCamera_CheckInitialized_Patch
+{
+    public static void Postfix()
+    {
+        CM_ExtraCamera.Current.GetComponent<UI_ScenePost>().enabled = false;
     }
 }
 
@@ -193,5 +213,13 @@ public static class CM_PlayerLobbyBar__DoIntro__Patch
         
         CoroutineManager.BlinkIn(guix, 0.2f * 5.0f + 0.5f);
         CoroutineManager.BlinkIn(lobbyBar.m_corners, 0.2f * 5.0f + 0.6f);
+
+        if (!(lobbyBar.m_player?.IsLocal ?? false))
+            return;
+        
+        var clothesButton = ClothesButton.GetOrSetupFromLobbyBar(lobbyBar);
+        
+        if (clothesButton != null)
+            CoroutineManager.BlinkIn(clothesButton.gameObject, 0.2f * 5.0f + 0.1f);
     }
 }
