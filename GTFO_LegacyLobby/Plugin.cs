@@ -1,9 +1,12 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using System.Reflection;
+using System.Text.Json;
 using Il2CppInterop.Runtime.Injection;
 using LegacyLobby.Components;
 using LegacyLobby.Extensions;
@@ -25,9 +28,12 @@ public class Plugin : BasePlugin
     public const string VERSION = "1.1.0";
 
     public const string FORCE_DEFAULT_VANITY_GUID = "JarheadHME.ForceDefaultVanity";
+    private const string CONFIG_FILE_NAME = $"{nameof(LegacyLobby)}_Config.json";
     
     internal static ManualLogSource L;
 
+    internal static Config LLConfig = new();
+    
     private static Harmony _harmony;
     
     internal static bool IsForceDefaultVanityInstalled { get; private set; }
@@ -43,8 +49,31 @@ public class Plugin : BasePlugin
         
         _harmony = new Harmony(GUID);
         _harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+        try
+        {
+            var configPath = Path.Combine(Paths.ConfigPath, CONFIG_FILE_NAME);
+            if (File.Exists(configPath))
+            {
+                LLConfig = JsonSerializer.Deserialize<Config>(File.ReadAllText(configPath));
+            }
+            else
+            {
+                File.WriteAllText(configPath, JsonSerializer.Serialize(LLConfig, new JsonSerializerOptions()
+                {
+                    WriteIndented = true
+                }));
+            }
+        }
+        catch (Exception ex)
+        {
+            L.LogWarning("Config file loading failed.");
+            L.LogError($"{ex.GetType().FullName}: {ex.Message}");
+            L.LogWarning($"Stacktrace:\n{ex.StackTrace}");
+            LLConfig = new();
+        }
     }
-    
+
     public static void LoadImage(byte[] bytes, out Texture2D tex)
     {
         tex = new Texture2D(2, 2);
