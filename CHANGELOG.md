@@ -1,4 +1,9 @@
 # Changelog
+## v1.2.0
+
+* Added Config file (`profile/BepInEx/config/LegacyLobby_Config.json`)
+  * Currently only used to toggle the default position of the 'ready' text
+
 ## v1.1.0
 
 * Replaced default Vanity button with a custom one
