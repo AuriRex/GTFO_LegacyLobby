@@ -18,6 +18,9 @@ public class ClothesButton : MonoBehaviour
     private static Sprite _icon;
     
     [HideFromIl2Cpp]
+    public bool HasBlinkedIn { get; set; }
+    
+    [HideFromIl2Cpp]
     private CM_PlayerLobbyBar _playerLobbyBar
     {
         get => _rf_playerLobbyBar.Get();
@@ -144,24 +147,22 @@ public class ClothesButton : MonoBehaviour
         _text.SetText(Text.Get(GameData.GD.Text.MainMenu_Lobby_PlayerBar_Apparel));
         
         var isLocal = _playerLobbyBar?.m_player?.IsLocal ?? false;
+        var showForBot = (_playerLobbyBar?.m_player?.IsBot ?? false) && transform.parent.FindExactChild("BotCustomization_ClothesButton") != null;
         
-        var enableClothesButton = isLocal
+        var enableClothesButton = (isLocal || showForBot)
             && GameStateManager.CurrentStateName != eGameStateName.Generating
             && GameStateManager.CurrentStateName != eGameStateName.InLevel
             && !GameStateManager.IsReady;
 
-        if (isActiveAndEnabled)
+        if (isActiveAndEnabled || HasBlinkedIn)
         {
-            gameObject.SetActive(isLocal);
+            gameObject.SetActive(isLocal || showForBot);
         }
-
-        if (!isLocal)
-            return;
         
         _item.SetButtonEnabled(enableClothesButton);
         _box.SetActive(enableClothesButton);
         
-        var shouldShow = AnyNewItems();
+        var shouldShow = isLocal && AnyNewItems();
         _attentionIcon.SetActive(shouldShow);
     }
 

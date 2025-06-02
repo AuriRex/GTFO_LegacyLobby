@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Reflection;
 using CellMenu;
 using HarmonyLib;
 using System.IO;
+using BepInEx.Unity.IL2CPP.Utils.Collections;
 using LegacyLobby.Components;
 using LegacyLobby.Extensions;
 using UnityEngine;
@@ -223,13 +225,22 @@ public static class CM_PlayerLobbyBar__DoIntro__Patch
         
         CoroutineManager.BlinkIn(guix, 0.2f * 5.0f + 0.5f);
         CoroutineManager.BlinkIn(lobbyBar.m_corners, 0.2f * 5.0f + 0.6f);
-
-        if (!(lobbyBar.m_player?.IsLocal ?? false))
-            return;
         
         var clothesButton = ClothesButton.GetOrSetupFromLobbyBar(lobbyBar);
-        
-        if (clothesButton != null)
-            CoroutineManager.BlinkIn(clothesButton.gameObject, 0.2f * 5.0f + 0.1f);
+
+        if (clothesButton == null)
+            return;
+
+        CoroutineManager.StartCoroutine(DoAfter(0.2f * 5.0f + 0.1f, () =>
+        {
+            clothesButton.HasBlinkedIn = true;
+            CoroutineManager.BlinkIn(clothesButton.gameObject);
+        }).WrapToIl2Cpp());
+    }
+
+    private static IEnumerator DoAfter(float delay, Action action)
+    {
+        yield return new WaitForSeconds(delay);
+        action?.Invoke();
     }
 }
