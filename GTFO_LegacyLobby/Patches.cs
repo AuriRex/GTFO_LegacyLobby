@@ -33,6 +33,7 @@ public static class CM_PageLoadout__Setup__Patch
 [HarmonyPatch(typeof(CM_PageRundown_New), nameof(CM_PageRundown_New.OnEnable))]
 public static class CM_PageRundown_New__OnEnable__Patch
 {
+    internal static Material originalScenePostMat;
     private static readonly int NOISE_MASK = Shader.PropertyToID("_NoiseMask");
     private static readonly int BACKGROUND_DESAT = Shader.PropertyToID("_BackgroundDesat");
     private static readonly int BACKGROUND_COLOR = Shader.PropertyToID("_BackgroundColor");
@@ -72,6 +73,8 @@ public static class CM_PageRundown_New__OnEnable__Patch
 
             var mat = CM_Camera.Current.gameObject.GetComponent<UI_ScenePost>().mat;
 
+            originalScenePostMat = new Material(mat);
+            
             // Red Channel = Main Desat applicator, Green Channel = Secondary with different scroll speed?
             mat.SetTexture(NOISE_MASK, texture); // Texture2D.whiteTexture
             mat.SetFloat(BACKGROUND_DESAT, 5);
@@ -197,7 +200,7 @@ public static class CM_ExtraCamera_CheckInitialized_Patch
 {
     public static void Postfix()
     {
-        CM_ExtraCamera.Current.GetComponent<UI_ScenePost>().enabled = false;
+        CM_ExtraCamera.Current.GetComponent<UI_ScenePost>().mat = CM_PageRundown_New__OnEnable__Patch.originalScenePostMat;
     }
 }
 
