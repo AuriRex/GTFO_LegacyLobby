@@ -11,6 +11,7 @@ namespace LegacyLobby;
 
 [HarmonyWrapSafe]
 [HarmonyPatch(typeof(CM_PageLoadout), nameof(CM_PageLoadout.Setup))]
+[HarmonyPriority(Priority.Last)]
 public static class CM_PageLoadout__Setup__Patch
 {
     public static void Postfix(CM_PageLoadout __instance)
@@ -18,10 +19,13 @@ public static class CM_PageLoadout__Setup__Patch
         var decorText = __instance.m_readyButtonAlign.FindExactChild("DecorText");
         decorText.gameObject.SetActive(true);
 
-        var decorTextTwo = UnityEngine.Object.Instantiate(decorText, __instance.m_dropButton.transform);
-        decorTextTwo.localPosition = Vector3.zero;
+        var decorTextDropButton = UnityEngine.Object.Instantiate(decorText, __instance.m_dropButton.transform);
+        decorTextDropButton.localPosition = Vector3.zero;
         
-        decorText.SetParent(__instance.m_readyButton.transform, true);
+        var decorTextReadyButton = UnityEngine.Object.Instantiate(decorText, __instance.m_readyButton.transform);
+        decorTextReadyButton.localPosition = Vector3.zero;
+        
+        decorText.gameObject.SetActive(false);
     }
 }
 
