@@ -1,4 +1,9 @@
 # Changelog
+## v1.3.0
+
+* Fix issues with other mods (primarily LobbyExpansion, where the lobby switch buttons would get broken)
+* The Vanity preview camera now gets the proper (default) post-porcessing applied again.
+
 ## v1.2.0
 
 * Added Config file (`profile/BepInEx/config/LegacyLobby_Config.json`)
