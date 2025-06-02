@@ -1,4 +1,9 @@
 # Changelog
+## v1.3.1
+
+* Fixed vanity button disappearing in certain conditions
+* Vanity button now shows up for bots if Archives BotCustomization is enabled
+
 ## v1.3.0
 
 * Fix issues with other mods (primarily LobbyExpansion, where the lobby switch buttons would get broken)
